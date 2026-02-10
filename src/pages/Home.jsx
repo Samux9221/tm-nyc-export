@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient'; 
+// Removi o useNavigate pois a Home não precisa mais dele, quem navega é o componente Categories
 
 // === IMPORTANDO SEUS COMPONENTES VISUAIS ===
 import { Header } from '../components/Header';
-import { Hero } from '../components/Hero'; // <--- Seu Hero original volta aqui!
+import { Hero } from '../components/Hero';
 import { Categories } from '../components/Categories';
 import { Logistics } from '../components/Logistics';
 import { Testimonials } from '../components/Testimonials';
@@ -30,20 +31,24 @@ export function Home() {
     else { setFeaturedProducts(data); }
   }
 
+  // === AQUI ESTAVA O ERRO ===
+  // Removi a função handleCategoryClick daqui. 
+  // O componente <Categories /> já cuida disso sozinho.
+
   return (
     <div className="bg-brand-dark min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1">
         
-        {/* 1. SEU HERO ORIGINAL (Logitech Style) */}
+        {/* 1. SEU HERO ORIGINAL */}
         <Hero />
 
         {/* 2. SUAS CATEGORIAS ORIGINAIS */}
+        {/* Esse componente já tem a lógica de navegação dentro dele */}
         <Categories />
 
         {/* 3. AQUI ENTRA A SEÇÃO INTELIGENTE (SUPABASE) */}
-        {/* Substituímos o componente estático FeaturedProducts por esse código dinâmico */}
         <section className="py-20 container mx-auto px-4">
           <div className="flex justify-between items-end mb-12">
             <div>

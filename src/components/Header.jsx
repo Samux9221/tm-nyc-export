@@ -73,7 +73,7 @@ export function Header() {
             <a href="#" className="text-white hover:text-brand-red py-2 border-b border-neutral-800 transition-colors uppercase font-medium">Sobre Nós</a>
             
             <button className="bg-brand-green text-white py-4 rounded font-bold uppercase mt-4 shadow-lg w-full">
-              Chamar no Zap
+              Falar no Zap
             </button>
           </nav>
         </div>

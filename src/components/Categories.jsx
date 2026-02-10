@@ -1,27 +1,48 @@
+import { useNavigate } from 'react-router-dom';
 import { Smartphone, Laptop, Watch, Package } from 'lucide-react';
 
 export function Categories() {
-  // 1. DADOS: Aqui definimos o conteúdo. Fica fácil editar depois.
+  const navigate = useNavigate();
+
+  // Função para lidar com o clique
+  const handleCategoryClick = (categoryFilter) => {
+    // Se for "encomendas", mandamos pro WhatsApp
+    if (categoryFilter === 'custom') {
+      window.open('https://wa.me/5511999999999?text=Quero encomendar algo', '_blank');
+      return;
+    }
+
+    // === A CORREÇÃO ESTÁ AQUI EMBAIXO ===
+    // Mudamos de '/catalog' para '/catalogo' para bater com o App.jsx
+    navigate(`/catalogo?category=${categoryFilter}`);
+    
+    window.scrollTo(0, 0); // Sobe a tela pro topo
+  };
+
   const categories = [
     { 
       name: "Apple iPhone", 
       desc: "Do 13 ao 16 Pro Max", 
-      icon: Smartphone 
+      icon: Smartphone,
+      filter: "apple" 
     },
     { 
       name: "MacBooks & iPads", 
       desc: "Linha M1, M2 e M3", 
-      icon: Laptop 
+      icon: Laptop,
+      filter: "notebooks" 
     },
     { 
       name: "Smartwatches", 
       desc: "Apple Watch e Garmin", 
-      icon: Watch 
+      icon: Watch,
+      filter: "smartwatch" 
     },
     { 
       name: "Encomendas", 
       desc: "Traga seu produto dos EUA", 
-      icon: Package 
+      icon: Package,
+      filter: "custom" 
     },
   ];
 
@@ -38,20 +59,16 @@ export function Categories() {
           </p>
         </div>
 
-        {/* 2. GRID: O Tailwind faz a mágica responsiva aqui 
-            grid-cols-1 = 1 coluna no celular
-            md:grid-cols-2 = 2 colunas no tablet
-            lg:grid-cols-4 = 4 colunas no PC
-        */}
+        {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          {/* 3. MAP: O React percorre a lista e cria um card para cada item */}
           {categories.map((item, index) => (
             <div 
               key={index} 
+              onClick={() => handleCategoryClick(item.filter)}
               className="group bg-neutral-900/50 p-8 rounded-2xl border border-neutral-800 hover:border-brand-red/50 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
             >
-              {/* O ícone muda de cor quando passa o mouse no card (group-hover) */}
+              {/* O ícone muda de cor */}
               <div className="bg-brand-gray w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-red transition-colors duration-300">
                 <item.icon className="text-white w-7 h-7" />
               </div>

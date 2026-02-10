@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, LogOut, Plus, Search, Trash2, Edit, X, Save, DollarSign, Upload, Loader2 } from 'lucide-react';
+// Adicionei MessageSquare nos imports
+import { LayoutDashboard, Package, LogOut, Plus, Search, Trash2, Edit, X, Save, Upload, Loader2, MessageSquare } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+
+// IMPORT DO NOVO COMPONENTE (Certifique-se que o caminho está correto)
+import { TestimonialsManager } from '../components/admin/TestimonialsManager';
 
 export function Admin() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('products'); // Pode ser: 'products', 'dashboard' ou 'testimonials'
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Estado para controlar o upload da imagem
   const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -40,32 +43,23 @@ export function Admin() {
     setLoading(false);
   }
 
-  // === MÁGICA DO UPLOAD DE IMAGEM ===
   async function handleImageUpload(e) {
     try {
       setUploading(true);
       const file = e.target.files[0];
       if (!file) return;
 
-      // 1. Cria um nome único para o arquivo (para não substituir outros)
-      // Ex: 123456789-iphone.jpg
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      // 2. Sobe o arquivo para o bucket 'images'
       const { error: uploadError } = await supabase.storage
-        .from('images') // <--- NOME DO SEU BUCKET
+        .from('images')
         .upload(filePath, file);
 
-      if (uploadError) {
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
 
-      // 3. Pega a URL pública para salvar no banco
       const { data } = supabase.storage.from('images').getPublicUrl(filePath);
-      
-      // 4. Atualiza o formulário com a URL gerada
       setFormData(prev => ({ ...prev, image: data.publicUrl }));
       
     } catch (error) {
@@ -131,29 +125,49 @@ export function Admin() {
   const totalValue = products.reduce((acc, p) => acc + p.price, 0);
   const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  // Função auxiliar para o título da página
+  const getPageTitle = () => {
+    if (activeTab === 'products') return 'Gerenciar Produtos';
+    if (activeTab === 'testimonials') return 'Gerenciar Depoimentos';
+    return 'Visão Geral';
+  };
+
   return (
     <div className="flex h-screen bg-brand-dark text-gray-100 font-sans overflow-hidden">
-      {/* SIDEBAR - MANTIDA IGUAL */}
+      
+      {/* SIDEBAR */}
       <aside className="w-64 bg-neutral-900 border-r border-neutral-800 flex flex-col hidden md:flex">
         <div className="p-6 border-b border-neutral-800">
           <h1 className="text-2xl font-bold text-white tracking-tighter">ADMIN<span className="text-brand-red">.</span></h1>
         </div>
         <nav className="flex-1 p-4 space-y-2">
+          
+          {/* Botão Produtos */}
           <button onClick={() => setActiveTab('products')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'products' ? 'bg-brand-red text-white' : 'text-gray-400 hover:bg-white/5'}`}>
             <Package size={20} /> <span className="font-medium">Produtos</span>
           </button>
+          
+          {/* Botão Dashboard */}
           <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'dashboard' ? 'bg-brand-red text-white' : 'text-gray-400 hover:bg-white/5'}`}>
             <LayoutDashboard size={20} /> <span className="font-medium">Visão Geral</span>
           </button>
+
+          {/* === NOVO BOTÃO DEPOIMENTOS === */}
+          <button onClick={() => setActiveTab('testimonials')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'testimonials' ? 'bg-brand-red text-white' : 'text-gray-400 hover:bg-white/5'}`}>
+            <MessageSquare size={20} /> <span className="font-medium">Depoimentos</span>
+          </button>
+
         </nav>
         <div className="p-4"><button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg"><LogOut size={20} /><span>Sair</span></button></div>
       </aside>
 
+      {/* MAIN CONTENT */}
       <main className="flex-1 overflow-y-auto bg-black/20 p-4 md:p-8">
         <header className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-white">{activeTab === 'products' ? 'Gerenciar Produtos' : 'Visão Geral'}</h2>
+          <h2 className="text-3xl font-bold text-white">{getPageTitle()}</h2>
         </header>
 
+        {/* === CONTEÚDO DA DASHBOARD === */}
         {activeTab === 'dashboard' && (
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div className="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
@@ -167,6 +181,12 @@ export function Admin() {
            </div>
         )}
 
+        {/* === CONTEÚDO DOS DEPOIMENTOS (NOVO) === */}
+        {activeTab === 'testimonials' && (
+          <TestimonialsManager />
+        )}
+
+        {/* === CONTEÚDO DOS PRODUTOS === */}
         {activeTab === 'products' && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-neutral-900 p-4 rounded-xl border border-neutral-800">
@@ -186,7 +206,7 @@ export function Admin() {
                   {filteredProducts.map((product) => (
                     <tr key={product.id} className="hover:bg-white/5">
                       <td className="p-5 flex items-center gap-4">
-                        <img src={product.image} className="w-12 h-12 rounded object-cover bg-gray-800" />
+                        <img src={product.image} className="w-12 h-12 rounded object-cover bg-gray-800" alt="" />
                         <span className="font-bold text-white">{product.name}</span>
                       </td>
                       <td className="p-5 text-brand-green font-mono">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}</td>
@@ -203,7 +223,7 @@ export function Admin() {
         )}
       </main>
 
-      {/* FORMULÁRIO COM UPLOAD */}
+      {/* FORMULÁRIO DE PRODUTOS (MODAL) */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="bg-neutral-900 w-full max-w-lg rounded-2xl border border-neutral-700 shadow-2xl">
@@ -225,35 +245,23 @@ export function Admin() {
                 </div>
               </div>
 
-              {/* === CAMPO DE UPLOAD DE IMAGEM === */}
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Imagem do Produto</label>
-                
                 <div className="flex items-center gap-4">
-                  {/* Pré-visualização da imagem */}
                   {formData.image && (
                     <div className="w-16 h-16 rounded-lg overflow-hidden border border-neutral-700 relative group">
                        <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
-
-                  {/* Botão de Upload Customizado */}
                   <label className="flex-1 cursor-pointer">
                     <div className={`flex items-center justify-center gap-2 w-full p-3 rounded-lg border border-dashed border-neutral-600 hover:border-brand-red transition-colors ${uploading ? 'bg-white/5 opacity-50' : 'bg-black'}`}>
                       {uploading ? (
-                         <> <Loader2 className="animate-spin" size={20} /> <span className="text-sm text-gray-400">Enviando...</span> </>
+                          <> <Loader2 className="animate-spin" size={20} /> <span className="text-sm text-gray-400">Enviando...</span> </>
                       ) : (
-                         <> <Upload size={20} className="text-gray-400" /> <span className="text-sm text-gray-400">Clique para enviar foto</span> </>
+                          <> <Upload size={20} className="text-gray-400" /> <span className="text-sm text-gray-400">Clique para enviar foto</span> </>
                       )}
                     </div>
-                    {/* Input file invisível */}
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleImageUpload} 
-                      className="hidden" 
-                      disabled={uploading}
-                    />
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
                   </label>
                 </div>
               </div>
