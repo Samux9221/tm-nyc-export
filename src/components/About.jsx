@@ -24,6 +24,7 @@ export function About() {
           </p>
         </div>
       </div>
+    
 
       {/* CONTEÚDO */}
       <main className="container mx-auto px-4 py-20">
