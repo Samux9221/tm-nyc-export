@@ -72,7 +72,7 @@ export function Footer() {
 
         {/* Barra Inferior (Copyright) */}
         <div className="pt-8 border-t border-neutral-900 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-600">
-          <p>&copy; 2024 TM NYC Export. Todos os direitos reservados.</p>
+          <p>&copy; 2026 TM NYC Export. Todos os direitos reservados.</p>
           <div className="flex gap-4 mt-4 md:mt-0">
             <a href="#" className="hover:text-gray-400">Termos de Uso</a>
             <a href="#" className="hover:text-gray-400">Política de Privacidade</a>

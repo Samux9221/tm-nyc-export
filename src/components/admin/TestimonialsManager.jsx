@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { supabase } from '../../supabaseClient';
 import { Trash2, Plus, Star, User, MessageSquare, Pencil, Save, X, DownloadCloud, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast'; // Usando a biblioteca de notificações
 
 export function TestimonialsManager() {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listLoaded, setListLoaded] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null); // Para mostrar o erro na tela
   
+  // Estado de Edição
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -19,35 +20,39 @@ export function TestimonialsManager() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // --- CARREGAR ---
   async function loadTestimonials() {
     setLoading(true);
-    setErrorMsg(null);
     setListLoaded(true); 
 
     try {
-      // O FIX ESTÁ AQUI: Adicionei .select('*')
       const { data, error } = await supabase
         .from('testimonials')
-        .select('*') // <--- FALTAVA ISSO AQUI!
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
       setTestimonials(data || []);
+      toast.success('Lista atualizada!');
     } catch (error) {
-      console.error('Erro detalhado:', error);
-      setErrorMsg(error.message || 'Falha desconhecida ao conectar.');
+      console.error('Erro:', error);
+      toast.error('Erro ao carregar depoimentos.');
     } finally {
       setLoading(false);
     }
   }
 
+  // --- SALVAR (Criar ou Editar) ---
   async function handleSave(e) {
     e.preventDefault();
-    if (!formData.name || !formData.content) return;
+    if (!formData.name || !formData.content) {
+        toast.error('Preencha nome e conteúdo.');
+        return;
+    }
     
     setIsSubmitting(true);
-    setErrorMsg(null);
+    const toastId = toast.loading(editingId ? 'Atualizando...' : 'Salvando...');
 
     try {
       if (editingId) {
@@ -68,7 +73,8 @@ export function TestimonialsManager() {
         if (listLoaded) {
           setTestimonials(prev => prev.map(item => item.id === editingId ? data[0] : item));
         }
-        alert('Atualizado com sucesso!'); // Feedback simples
+        
+        toast.success('Depoimento atualizado!', { id: toastId });
 
       } else {
         // === CRIAR ===
@@ -88,32 +94,35 @@ export function TestimonialsManager() {
           setTestimonials(prev => [data[0], ...prev]);
         }
         
-        // Feedback visual no botão
-        const btn = document.getElementById('submitBtn');
-        if(btn) {
-           const originalText = btn.innerHTML;
-           btn.innerText = "Salvo!";
-           setTimeout(() => btn.innerHTML = originalText, 2000);
-        }
+        toast.success('Depoimento publicado!', { id: toastId });
       }
 
       resetForm();
 
     } catch (error) {
-      setErrorMsg('Erro ao salvar: ' + error.message);
+      console.error(error);
+      toast.error('Erro ao salvar: ' + error.message, { id: toastId });
     } finally {
       setIsSubmitting(false);
     }
   }
 
+  // --- DELETAR ---
   async function handleDelete(id) {
-    if (!confirm('Tem certeza?')) return;
+    // Nota: Mantivemos o confirm nativo por segurança, mas o resultado usa Toast
+    if (!window.confirm('Tem certeza que deseja excluir este depoimento permanentemente?')) return;
+    
+    const toastId = toast.loading('Excluindo...');
+
     try {
       const { error } = await supabase.from('testimonials').delete().eq('id', id);
       if (error) throw error;
+      
       setTestimonials(prev => prev.filter(t => t.id !== id));
+      toast.success('Depoimento removido.', { id: toastId });
+
     } catch (error) {
-      alert('Erro ao deletar: ' + error.message);
+      toast.error('Erro ao deletar: ' + error.message, { id: toastId });
     }
   }
 
@@ -125,7 +134,9 @@ export function TestimonialsManager() {
       content: item.content,
       rating: item.rating
     });
+    // Rola para o topo suavemente para editar
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    toast("Modo de edição ativado", { icon: '✏️' });
   }
 
   function resetForm() {
@@ -145,24 +156,9 @@ export function TestimonialsManager() {
         </div>
       </div>
 
-      {/* ÁREA DE ERRO (Se houver algum problema, aparece aqui em cima) */}
-      {errorMsg && (
-        <div className="bg-red-500/10 border border-red-500/50 text-red-200 p-4 rounded-xl mb-6 flex items-center gap-3">
-          <AlertCircle className="shrink-0" />
-          <div>
-            <p className="font-bold">Ocorreu um erro:</p>
-            <p className="text-sm opacity-80">{errorMsg}</p>
-          </div>
-          <button onClick={() => setErrorMsg(null)} className="ml-auto hover:bg-red-500/20 p-2 rounded">
-            <X size={18} />
-          </button>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
         {/* === FORMULÁRIO === */}
-        {/* Lógica de layout: Se a lista NÃO foi carregada, usa lg:col-span-3 (TELA TODA). Se carregou, usa lg:col-span-1 */}
         <div className={`transition-all duration-500 ${listLoaded ? 'lg:col-span-1 lg:sticky lg:top-4' : 'lg:col-span-3 w-full'}`}>
           <div className={`rounded-2xl border p-6 shadow-2xl relative overflow-hidden transition-colors duration-300 ${editingId ? 'bg-neutral-900 border-brand-red/50' : 'bg-neutral-900 border-neutral-800'}`}>
             
@@ -242,13 +238,12 @@ export function TestimonialsManager() {
                 )}
                 
                 <button 
-                  id="submitBtn"
                   type="submit" 
                   disabled={isSubmitting}
                   className={`flex-[2] text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 ${editingId ? 'bg-brand-red hover:bg-red-600' : 'bg-brand-green hover:bg-green-600'}`}
                 >
                   {isSubmitting ? (
-                    <span className="animate-pulse">Salvando...</span>
+                    <span className="animate-pulse">Processando...</span>
                   ) : (
                     <> <Save size={18} /> {editingId ? 'Atualizar' : 'Publicar'} </>
                   )}
@@ -260,12 +255,10 @@ export function TestimonialsManager() {
         </div>
 
         {/* === ÁREA DA LISTA === */}
-        {/* Se a lista estiver carregada (mesmo que com erro ou vazia), ela ocupa 2 colunas. Se não, ela some ou mostra o botão de carregar abaixo se quisermos (mas neste layout full width, vamos colocar o botão de carregar no topo ou abaixo do form full width) */}
-        
         <div className={`space-y-4 ${listLoaded ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
           
           {!listLoaded ? (
-             /* BOTÃO PARA CARREGAR A LISTA (Agora Full Width abaixo do form) */
+             /* BOTÃO PARA CARREGAR A LISTA */
              <div className="text-center py-8 bg-neutral-900/30 rounded-2xl border border-dashed border-neutral-800 flex flex-col items-center justify-center gap-4 mt-8">
                 <div className="flex flex-col items-center">
                   <h3 className="text-gray-300 font-bold text-lg">Gerenciar Depoimentos Antigos</h3>
@@ -292,8 +285,7 @@ export function TestimonialsManager() {
                 </div>
               ) : testimonials.length === 0 ? (
                 <div className="text-center py-20 bg-neutral-900/50 rounded-2xl border border-dashed border-neutral-800">
-                   {/* Se tiver erroMsg, o aviso já está lá no topo. Se não tiver erro e estiver vazio: */}
-                  {!errorMsg && <p className="text-gray-500">Nenhum depoimento encontrado.</p>}
+                   <p className="text-gray-500">Nenhum depoimento encontrado.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -5,3 +5,31 @@
 body {
   @apply bg-brand-dark text-white;
 }
+::-webkit-scrollbar {
+  width: 10px;               /* Largura da barra vertical */
+  height: 10px;              /* Altura da barra horizontal */
+}
+
+/* O "trilho" por onde a barra corre (Fundo) */
+::-webkit-scrollbar-track {
+  background: #171717;       /* Cor escura (neutral-900) */
+  border-radius: 4px;
+}
+
+/* A barra em si (O que você arrasta) */
+::-webkit-scrollbar-thumb {
+  background: #333;          /* Cinza escuro discreto */
+  border-radius: 4px;
+  border: 2px solid #171717; /* Borda para dar efeito de espaçamento */
+}
+
+/* Quando passa o mouse em cima da barra */
+::-webkit-scrollbar-thumb:hover {
+  background: #ef4444;       /* VERMELHO DA MARCA (brand-red) */
+}
+
+/* === PARA O FIREFOX (Navegadores Mozilla usam outra regra) === */
+* {
+  scrollbar-width: thin;          /* Barra fininha */
+  scrollbar-color: #333 #171717;  /* Cor da barra | Cor do fundo */
+}

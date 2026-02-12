@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Adicionei MessageSquare nos imports
 import { LayoutDashboard, Package, LogOut, Plus, Search, Trash2, Edit, X, Save, Upload, Loader2, MessageSquare } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
@@ -9,7 +8,7 @@ import { TestimonialsManager } from '../components/admin/TestimonialsManager';
 
 export function Admin() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('products'); // Pode ser: 'products', 'dashboard' ou 'testimonials'
+  const [activeTab, setActiveTab] = useState('products'); 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +22,8 @@ export function Admin() {
     price: '',
     category: 'Smartphones',
     image: '',
-    featured: false
+    featured: false,
+    description: '' // <--- 1. NOVO: Adicionado ao estado inicial
   });
 
   useEffect(() => {
@@ -71,12 +71,15 @@ export function Admin() {
 
   async function handleSave(e) {
     e.preventDefault();
+    
+    // === 2. ALTERADO: Adicionando description ao objeto que vai pro banco ===
     const productData = {
       name: formData.name,
       price: parseFloat(formData.price),
       category: formData.category,
       image: formData.image,
-      featured: formData.featured
+      featured: formData.featured,
+      description: formData.description // <--- Importante: enviando para o Supabase
     };
 
     let error;
@@ -98,7 +101,8 @@ export function Admin() {
   }
 
   function handleEdit(product) {
-    setFormData({ ...product });
+    // Aqui ele já puxa a descrição se ela existir no banco
+    setFormData({ ...product }); 
     setIsFormOpen(true);
   }
 
@@ -114,7 +118,8 @@ export function Admin() {
   }
 
   function resetForm() {
-    setFormData({ id: null, name: '', price: '', category: 'Smartphones', image: '', featured: false });
+    // === 3. ALTERADO: Resetando a descrição também ===
+    setFormData({ id: null, name: '', price: '', category: 'Smartphones', image: '', featured: false, description: '' });
   }
 
   async function handleLogout() {
@@ -125,7 +130,6 @@ export function Admin() {
   const totalValue = products.reduce((acc, p) => acc + p.price, 0);
   const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  // Função auxiliar para o título da página
   const getPageTitle = () => {
     if (activeTab === 'products') return 'Gerenciar Produtos';
     if (activeTab === 'testimonials') return 'Gerenciar Depoimentos';
@@ -142,17 +146,14 @@ export function Admin() {
         </div>
         <nav className="flex-1 p-4 space-y-2">
           
-          {/* Botão Produtos */}
           <button onClick={() => setActiveTab('products')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'products' ? 'bg-brand-red text-white' : 'text-gray-400 hover:bg-white/5'}`}>
             <Package size={20} /> <span className="font-medium">Produtos</span>
           </button>
           
-          {/* Botão Dashboard */}
           <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'dashboard' ? 'bg-brand-red text-white' : 'text-gray-400 hover:bg-white/5'}`}>
             <LayoutDashboard size={20} /> <span className="font-medium">Visão Geral</span>
           </button>
 
-          {/* === NOVO BOTÃO DEPOIMENTOS === */}
           <button onClick={() => setActiveTab('testimonials')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === 'testimonials' ? 'bg-brand-red text-white' : 'text-gray-400 hover:bg-white/5'}`}>
             <MessageSquare size={20} /> <span className="font-medium">Depoimentos</span>
           </button>
@@ -167,7 +168,6 @@ export function Admin() {
           <h2 className="text-3xl font-bold text-white">{getPageTitle()}</h2>
         </header>
 
-        {/* === CONTEÚDO DA DASHBOARD === */}
         {activeTab === 'dashboard' && (
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div className="bg-neutral-900 p-6 rounded-xl border border-neutral-800">
@@ -181,12 +181,10 @@ export function Admin() {
            </div>
         )}
 
-        {/* === CONTEÚDO DOS DEPOIMENTOS (NOVO) === */}
         {activeTab === 'testimonials' && (
           <TestimonialsManager />
         )}
 
-        {/* === CONTEÚDO DOS PRODUTOS === */}
         {activeTab === 'products' && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-neutral-900 p-4 rounded-xl border border-neutral-800">
@@ -225,8 +223,8 @@ export function Admin() {
 
       {/* FORMULÁRIO DE PRODUTOS (MODAL) */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="bg-neutral-900 w-full max-w-lg rounded-2xl border border-neutral-700 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-neutral-900 w-full max-w-lg rounded-2xl border border-neutral-700 shadow-2xl my-8">
             <div className="flex justify-between items-center p-6 border-b border-neutral-800">
               <h3 className="text-xl font-bold text-white">{formData.id ? 'Editar' : 'Novo'}</h3>
               <button onClick={() => setIsFormOpen(false)} className="text-gray-400 hover:text-white"><X size={24} /></button>
@@ -245,12 +243,24 @@ export function Admin() {
                 </div>
               </div>
 
+              {/* === 4. NOVO: CAMPO DE DESCRIÇÃO === */}
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Descrição Detalhada</label>
+                <textarea 
+                  rows="4"
+                  placeholder="Descreva detalhes, especificações, garantia..."
+                  value={formData.description || ''} // Proteção contra null
+                  onChange={e => setFormData({...formData, description: e.target.value})}
+                  className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white focus:border-brand-red outline-none resize-none"
+                />
+              </div>
+
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Imagem do Produto</label>
                 <div className="flex items-center gap-4">
                   {formData.image && (
                     <div className="w-16 h-16 rounded-lg overflow-hidden border border-neutral-700 relative group">
-                       <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                        <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
                     </div>
                   )}
                   <label className="flex-1 cursor-pointer">
