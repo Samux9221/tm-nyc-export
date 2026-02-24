@@ -5,11 +5,19 @@ export function MobileNav() {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
 
+  // 1. VERIFICAÇÃO DE ROTA: Descobre se o usuário está no Admin ou no Login
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/login');
+
+  // 2. REGRA DE BLOQUEIO: Se for rota de admin, não renderiza este menu público!
+  if (isAdminRoute) {
+    return null;
+  }
+
+  // 3. RENDERIZAÇÃO NORMAL: Para todas as outras páginas (Home, Catálogo, etc)
   return (
-    // Container Principal
     <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] h-16 bg-neutral-900/95 backdrop-blur-lg border border-white/10 rounded-full shadow-2xl z-50 md:hidden px-2">
       
-      {/* GRID: Divide perfeitamente em 5 partes iguais (20% do espaço para cada) */}
+      {/* GRID: Divide perfeitamente em 5 partes iguais */}
       <div className="grid grid-cols-5 h-full items-center">
         
         {/* 1. Início */}
@@ -24,7 +32,7 @@ export function MobileNav() {
           <span className="text-[10px] font-medium">Sobre</span>
         </Link>
 
-        {/* 3. Botão Central (Catálogo) - Fica na coluna do meio e flutua para cima */}
+        {/* 3. Botão Central (Catálogo) */}
         <div className="relative flex justify-center w-full h-full">
           <Link 
             to="/catalogo" 

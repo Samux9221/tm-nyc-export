@@ -1,0 +1,20 @@
+name: Despertador do Supabase
+
+# Configura o alarme para tocar todo dia ao meio-dia (UTC)
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  # Permite que você também rode o script manualmente clicando em um botão no GitHub
+  workflow_dispatch: 
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fazendo uma requisição para o banco de dados
+        # Esse comando faz uma leitura rápida na sua tabela (ex: produtos) usando sua chave pública.
+        # Ele registra "atividade" no Supabase e impede que o projeto hiberne.
+        run: |
+          curl -X GET '${{ secrets.VITE_SUPABASE_URL }}/rest/v1/produtos?select=id&limit=1' \
+          -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}"

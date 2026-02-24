@@ -18,11 +18,13 @@ export function Footer() {
           
           {/* Coluna 1: Sobre a Marca */}
           <div className="lg:pr-8">
-            <Link to="/" className="inline-block mb-6">
-              <h2 className="text-2xl font-extrabold text-white tracking-wider">
-                TM NYC<span className="text-brand-red">.</span>
+            <div className="inline-block mb-6">
+              <h2 className="text-2xl font-extrabold text-white tracking-wider flex items-center">
+                <Link to="/">TM NYC</Link>
+                {/* O LINK SECRETO: Apenas o ponto vermelho leva ao admin. O cursor-default esconde a mãozinha do mouse */}
+                <Link to="/admin" className="text-brand-red cursor-default">.</Link>
               </h2>
-            </Link>
+            </div>
             <p className="text-sm leading-relaxed mb-8 text-neutral-500">
               Especialistas em trazer tecnologia e exclusividade dos EUA para o Brasil. 
               Segurança, transparência e agilidade na sua importação.
@@ -54,7 +56,6 @@ export function Footer() {
               <li><Link to="/" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Início</Link></li>
               <li><Link to="/catalogo" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Catálogo Completo</Link></li>
               <li><a href="#como-funciona" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Como Funciona</a></li>
-              {/* Se não tiver página de rastreio ainda, pode apontar para o zap */}
               <li><a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:translate-x-1 inline-flex items-center gap-1 transition-all duration-300 group">Rastrear Pedido <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
             </ul>
           </div>
