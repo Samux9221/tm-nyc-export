@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fazendo uma requisição para o banco de dados
-        # Puxa os segredos do GitHub e transforma em variáveis locais
         env:
-          URL: ${{ secrets.VITE_SUPABASE_URL }}
+          # URL direta (como é texto puro, fica entre aspas, SEM as chaves do GitHub)
+          URL: "https://vyjajsgmgdtkmojpwpuf.supabase.co"
+          # KEY protegida (aqui sim usamos as chaves, pois ele vai buscar lá nos Secrets)
           KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-        # Usa as variáveis usando aspas duplas (para o Linux entender)
         run: |
           curl -X GET "$URL/rest/v1/produtos?select=id&limit=1" \
           -H "apikey: $KEY" \
