@@ -1,22 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { Smartphone, Laptop, Watch, Package } from 'lucide-react';
+import { Smartphone, Laptop, Watch, Package, ArrowUpRight } from 'lucide-react';
 
 export function Categories() {
   const navigate = useNavigate();
 
-  // Função para lidar com o clique
   const handleCategoryClick = (categoryFilter) => {
-    // Se for "encomendas", mandamos pro WhatsApp
     if (categoryFilter === 'custom') {
-      window.open('https://wa.me/5511999999999?text=Quero encomendar algo', '_blank');
+      window.open('https://wa.me/5511999999999?text=Olá! Gostaria de cotar a encomenda de um produto dos EUA.', '_blank');
       return;
     }
-
-    // === A CORREÇÃO ESTÁ AQUI EMBAIXO ===
-    // Mudamos de '/catalog' para '/catalogo' para bater com o App.jsx
     navigate(`/catalogo?category=${categoryFilter}`);
-    
-    window.scrollTo(0, 0); // Sobe a tela pro topo
+    window.scrollTo(0, 0); 
   };
 
   const categories = [
@@ -28,7 +22,7 @@ export function Categories() {
     },
     { 
       name: "MacBooks & iPads", 
-      desc: "Linha M1, M2 e M3", 
+      desc: "Linhas M1, M2 e M3", 
       icon: Laptop,
       filter: "notebooks" 
     },
@@ -47,36 +41,52 @@ export function Categories() {
   ];
 
   return (
-    <section className="bg-brand-dark py-20 border-t border-neutral-900">
-      <div className="container mx-auto px-4">
+    <section className="bg-[#050505] py-20 lg:py-24 border-t border-white/5 relative overflow-hidden">
+      
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-brand-red/5 blur-[120px] rounded-full pointer-events-none" />
+      
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         
-        {/* Título da Seção */}
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">O que importamos</h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Trabalhamos com produtos originais, lacrados e com garantia. 
-            Selecione uma categoria para saber mais.
+        <div className="mb-12 lg:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <span className="text-brand-red text-xs font-bold tracking-widest uppercase mb-3 block">
+              Catálogo de Elite
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.1]">
+              O melhor da tecnologia global.
+            </h2>
+          </div>
+          <p className="text-gray-400 text-sm md:text-base max-w-sm md:text-right border-l-2 md:border-l-0 md:border-r-2 border-brand-red/30 pl-4 md:pl-0 md:pr-4">
+            Produtos originais, lacrados e com garantia internacional. Selecione uma categoria para explorar.
           </p>
         </div>
 
-        {/* GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           
           {categories.map((item, index) => (
             <div 
               key={index} 
               onClick={() => handleCategoryClick(item.filter)}
-              className="group bg-neutral-900/50 p-8 rounded-2xl border border-neutral-800 hover:border-brand-red/50 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              className="group relative overflow-hidden bg-[#0a0a0a] p-4 sm:p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-white/5 hover:border-brand-red/30 transition-all duration-500 cursor-pointer hover:-translate-y-1 shadow-lg hover:shadow-brand-red/5 flex flex-col justify-between min-h-[160px] sm:min-h-[200px]"
             >
-              {/* O ícone muda de cor */}
-              <div className="bg-brand-gray w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-red transition-colors duration-300">
-                <item.icon className="text-white w-7 h-7" />
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-red/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              
+              <ArrowUpRight className="absolute top-4 right-4 lg:top-6 lg:right-6 text-neutral-600 group-hover:text-brand-red group-hover:-translate-y-1 group-hover:translate-x-1 transition-all duration-300 w-4 h-4 lg:w-5 lg:h-5" />
+
+              <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-lg lg:rounded-xl bg-neutral-900 border border-white/10 flex items-center justify-center mb-4 lg:mb-8 group-hover:bg-brand-red/10 group-hover:border-brand-red/30 group-hover:scale-110 transition-all duration-500">
+                <item.icon className="text-neutral-300 group-hover:text-brand-red w-5 h-5 lg:w-6 lg:h-6 transition-colors duration-500" />
               </div>
               
-              <h3 className="text-xl font-bold text-white mb-2">{item.name}</h3>
-              <p className="text-gray-500 text-sm group-hover:text-gray-300 transition-colors">
-                {item.desc}
-              </p>
+              <div>
+                {/* MICROAJUSTE: text-base no mobile (antes era text-sm) */}
+                <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-1 lg:mb-2 relative z-10 leading-tight">
+                  {item.name}
+                </h3>
+                {/* MICROAJUSTE: text-xs no mobile (antes era text-[10px]) */}
+                <p className="text-neutral-500 text-xs sm:text-sm group-hover:text-neutral-300 transition-colors duration-300 relative z-10 line-clamp-2">
+                  {item.desc}
+                </p>
+              </div>
             </div>
           ))}
 

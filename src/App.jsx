@@ -9,6 +9,7 @@ import { Admin } from './pages/Admin';
 import { Login } from './pages/Login'; 
 import { Toaster } from 'react-hot-toast';
 import { About } from './components/About';
+import { MobileNav } from './components/MobileNav';
 
 function App() {
   return (
@@ -49,7 +50,7 @@ function App() {
           <Route path="/login" element={<Login />} />
 
         </Routes>
-        <FloatingWhatsApp />
+        <MobileNav />
       </div>
     </BrowserRouter>
   );
