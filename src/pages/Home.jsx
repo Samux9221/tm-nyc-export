@@ -9,7 +9,6 @@ import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
 import { Categories } from '../components/Categories';
 import { Logistics } from '../components/Logistics';
-import { Testimonials } from '../components/Testimonials';
 import { Footer } from '../components/Footer';
 
 export function Home() {
@@ -83,7 +82,6 @@ export function Home() {
         </section>
 
         {/* 4. SEUS OUTROS COMPONENTES ORIGINAIS */}
-        <Testimonials />
         <Logistics />
 
       </main>
