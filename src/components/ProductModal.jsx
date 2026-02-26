@@ -1,179 +1,210 @@
-import { X, ShoppingCart, Check, Minus, Plus, ShieldCheck, Truck, Star } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export function ProductModal({ product, isOpen, onClose, onAddToCart }) {
+export function ProductModal({ isOpen, onClose, product, onAddToCart }) {
   const [quantity, setQuantity] = useState(1);
-  const [isAdded, setIsAdded] = useState(false);
 
-  // Fecha o modal se apertar ESC
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
-
+  // Reseta a quantidade sempre que o modal abrir com um novo produto
   useEffect(() => {
     if (isOpen) {
       setQuantity(1);
+      document.body.style.overflow = 'hidden';
+      // Injeta uma classe no body avisando que o modal abriu
+      document.body.classList.add('modal-open'); 
+    } else {
+      document.body.style.overflow = 'auto';
+      document.body.classList.remove('modal-open');
     }
+    return () => { 
+      document.body.style.overflow = 'auto'; 
+      document.body.classList.remove('modal-open');
+    };
   }, [isOpen]);
 
-  if (!isOpen || !product) return null;
+  if (!product) return null;
 
-  const imageUrl = product.image || product.image_url;
-
-  const handleAdd = () => {
+  function handleAdd() {
     onAddToCart(product, quantity);
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000);
+  }
+
+  // --- ANIMAÇÕES (Premium e Suaves) ---
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, transition: { duration: 0.3 } }
+  };
+
+  const modalVariants = {
+    hidden: { y: "100%", opacity: 0.5, scale: 0.95 },
+    visible: { 
+      y: 0, 
+      opacity: 1, 
+      scale: 1,
+      transition: { type: "spring", damping: 25, stiffness: 200 }
+    },
+    exit: { 
+      y: "100%", 
+      opacity: 0, 
+      transition: { duration: 0.3 }
+    }
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6"
-      role="dialog" 
-      aria-modal="true"
-    >
-      {/* 1. BACKDROP (Fundo Escuro para focar no modal) */}
-      <div 
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      ></div>
-
-      {/* 2. O MODAL EM SI (Com Scroll Interno) */}
-      <div className="relative w-full max-w-5xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden max-h-[90vh]">
-        
-        {/* Botão Fechar (Fixo no topo direito) */}
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 bg-black/60 hover:bg-red-600 text-white p-2 rounded-full transition-colors border border-white/10"
-        >
-          <X size={20} />
-        </button>
-
-        {/* === ÁREA ROLÁVEL (Para garantir que cabe em qualquer tela) === */}
-        <div className="flex flex-col md:flex-row w-full overflow-y-auto custom-scrollbar">
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6 lg:p-12">
           
-          {/* === COLUNA ESQUERDA: IMAGEM (Limpa e Sóbria) === */}
-          <div className="w-full md:w-1/2 bg-neutral-800/30 flex items-center justify-center p-8 min-h-[300px] relative">
+          {/* OVERLAY: Fundo escuro com Blur (Estilo iOS) */}
+          <motion.div 
+            variants={overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={onClose}
+            className="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer"
+          />
+
+          {/* O MODAL: Gaveta no celular, Painel no PC */}
+          <motion.div 
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative w-full sm:w-auto sm:max-w-4xl lg:max-w-5xl bg-[#0a0a0a] rounded-t-[32px] sm:rounded-[32px] shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[90vh] sm:max-h-[85vh] z-10 border border-white/5"
+          >
             
-            {imageUrl ? (
+            {/* --- INDICADOR DE GAVETA (Apenas Mobile) --- */}
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-white/20 rounded-full sm:hidden z-20 pointer-events-none" />
+
+            {/* BOTÃO DE FECHAR FLUTUANTE */}
+            <button 
+              onClick={onClose}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 bg-black/40 hover:bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all z-20 border border-white/10"
+            >
+              <X size={20} />
+            </button>
+
+            {/* --- ZONA DA IMAGEM (O Altar do Produto) --- */}
+            <div className="w-full sm:w-1/2 bg-[#111] relative flex items-center justify-center p-8 sm:p-12 min-h-[40vh] sm:min-h-0">
+              {/* Círculo de luz no fundo para dar destaque */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
+              
               <img 
-                src={imageUrl} 
+                src={product.image} 
                 alt={product.name} 
-                className="w-full h-full max-h-[400px] object-contain drop-shadow-lg"
+                className="w-full h-full object-contain drop-shadow-2xl relative z-10 max-h-[350px] sm:max-h-[500px]"
               />
-            ) : (
-              <div className="w-full h-64 flex items-center justify-center text-gray-600 border-2 border-dashed border-neutral-800 rounded-lg">
-                Sem imagem
-              </div>
-            )}
-
-            {/* Categoria Discreta */}
-            {product.category && (
-              <span className="absolute bottom-4 left-4 text-xs font-bold text-gray-400 bg-black/40 px-2 py-1 rounded border border-white/5 uppercase tracking-wide">
-                {product.category}
-              </span>
-            )}
-          </div>
-
-          {/* === COLUNA DIREITA: DETALHES === */}
-          <div className="w-full md:w-1/2 flex flex-col bg-neutral-900 p-6 md:p-8">
-            
-            {/* Header do Produto */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                 <span className="bg-green-500/10 text-green-500 text-xs font-bold px-2 py-0.5 rounded uppercase">Em Estoque</span>
-                 <div className="flex text-yellow-500 gap-0.5">
-                   {[...Array(5)].map((_, i) => <Star key={i} size={12} fill="currentColor" />)}
-                 </div>
-                 <span className="text-gray-500 text-xs">(4.9)</span>
-              </div>
-
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
-                {product.name}
-              </h2>
-
-              <div className="flex items-baseline gap-3 mt-2">
-                <span className="text-3xl font-bold text-brand-red">
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+              
+              {product.category && (
+                <span className="absolute top-6 left-6 bg-[#050505]/80 backdrop-blur-md border border-white/10 text-neutral-400 text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full z-10 hidden sm:block">
+                  {product.category}
                 </span>
-                {/* Preço "De" (Apenas visual, calculado 20% a mais) */}
-                <span className="text-gray-600 text-sm line-through decoration-gray-600">
-                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price * 1.2)}
-                </span>
-              </div>
+              )}
             </div>
 
-            {/* Descrição (Texto) */}
-            <div className="prose prose-invert prose-sm max-w-none text-gray-300 mb-8 leading-relaxed whitespace-pre-wrap">
-              <h3 className="text-white font-semibold text-base mb-2">Detalhes</h3>
-              {product.description || "Descrição padrão: Este produto oferece alta qualidade, durabilidade e desempenho. Ideal para o dia a dia com acabamento premium."}
-            </div>
-
-            {/* Badges de Confiança (Simples) */}
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              <div className="flex items-center gap-3 p-3 rounded bg-neutral-800/50 border border-neutral-800">
-                <ShieldCheck className="text-brand-green shrink-0" size={20} />
-                <div className="text-xs">
-                  <p className="text-white font-bold">Garantia Ativa</p>
-                  <p className="text-gray-500">3 Meses de suporte</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded bg-neutral-800/50 border border-neutral-800">
-                <Truck className="text-blue-400 shrink-0" size={20} />
-                <div className="text-xs">
-                  <p className="text-white font-bold">Entrega Segura</p>
-                  <p className="text-gray-500">Envio para todo Brasil</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Botões de Ação (Sempre no final do conteúdo) */}
-            <div className="mt-auto pt-6 border-t border-neutral-800">
-              <div className="flex flex-col sm:flex-row gap-4">
+            {/* --- ZONA DE INFORMAÇÃO --- */}
+            {/* Adicionado pb-32 no mobile para o conteúdo não ficar escondido atrás da barra fixa */}
+            <div className="w-full sm:w-1/2 flex flex-col bg-[#0a0a0a] overflow-y-auto custom-scrollbar-hide pb-28 sm:pb-0 relative">
+              
+              <div className="p-6 sm:p-10 lg:p-12 flex flex-col flex-1">
                 
-                {/* Quantidade */}
-                <div className="flex items-center bg-neutral-800 rounded-lg border border-neutral-700 w-full sm:w-auto justify-between">
+                {product.category && (
+                  <span className="text-neutral-500 text-[10px] uppercase tracking-widest mb-3 block sm:hidden">
+                    {product.category}
+                  </span>
+                )}
+
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-[1.1] mb-4">
+                  {product.name}
+                </h2>
+                
+                {/* Preço de Tabela de Luxo */}
+                <div className="mb-8">
+                  <span className="text-white text-2xl sm:text-3xl lg:text-4xl font-medium tracking-tight">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+                  </span>
+                  <span className="text-neutral-500 text-sm ml-2 font-light">
+                    à vista no PIX
+                  </span>
+                </div>
+
+                <div className="w-full h-px bg-white/5 mb-8" />
+
+                <div className="mb-8">
+                  <h3 className="text-white text-sm font-bold uppercase tracking-widest mb-3">
+                    Sobre o Produto
+                  </h3>
+                  <p className="text-neutral-400 text-sm leading-relaxed font-light">
+                    {product.description || "Este é um produto de importação premium, garantido com autenticidade, seguro total no envio e isenção de taxas surpresas. Uma escolha definitiva em tecnologia."}
+                  </p>
+                </div>
+
+                {/* --- SELEÇÃO DE QUANTIDADE (Estilo Apple Store) --- */}
+                <div className="mt-auto hidden sm:flex flex-col gap-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-neutral-400 text-sm">Quantidade</span>
+                    <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-full p-1">
+                      <button 
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-8 h-8 rounded-full bg-transparent flex items-center justify-center text-white hover:bg-white/10 transition-colors"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="w-4 text-center text-white font-medium text-sm">
+                        {quantity}
+                      </span>
+                      <button 
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* CTA Desktop */}
                   <button 
-                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="p-3 text-gray-400 hover:text-white hover:bg-neutral-700 rounded-l-lg transition-colors"
+                    onClick={handleAdd}
+                    className="w-full bg-white hover:bg-neutral-200 text-black font-bold py-4 rounded-full flex items-center justify-center gap-3 transition-colors duration-300"
                   >
-                    <Minus size={18} />
+                    <ShoppingBag size={18} />
+                    Adicionar à Sacola
                   </button>
-                  <span className="w-10 text-center text-white font-bold">{quantity}</span>
-                  <button 
-                    onClick={() => setQuantity(q => q + 1)}
-                    className="p-3 text-gray-400 hover:text-white hover:bg-neutral-700 rounded-r-lg transition-colors"
-                  >
-                    <Plus size={18} />
+                </div>
+              </div>
+
+              {/* === BARRA FIXA INFERIOR (APENAS MOBILE) === */}
+              {/* Usando "fixed" e amarrando na base da tela para criar a ergonomia do polegar */}
+              <div className="fixed sm:hidden bottom-0 left-0 w-full bg-[#0a0a0a]/90 backdrop-blur-xl border-t border-white/10 p-5 z-30 flex items-center gap-4">
+                
+                {/* Quantidade Mobile Minimalista */}
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full p-1 shrink-0">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center text-neutral-400 active:text-white">
+                    <Minus size={16} />
+                  </button>
+                  <span className="text-white font-medium min-w-[12px] text-center">
+                    {quantity}
+                  </span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center text-neutral-400 active:text-white">
+                    <Plus size={16} />
                   </button>
                 </div>
 
-                {/* Botão Comprar */}
-                <button
+                {/* CTA Mobile Alto Contraste */}
+                <button 
                   onClick={handleAdd}
-                  disabled={isAdded}
-                  className={`flex-1 py-3 px-6 rounded-lg font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 transition-all shadow-lg
-                    ${isAdded 
-                      ? 'bg-green-600 text-white cursor-default' 
-                      : 'bg-brand-red hover:bg-red-700 text-white'
-                    }`}
+                  className="flex-1 bg-white active:scale-95 text-black font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all"
                 >
-                  {isAdded ? (
-                    <> <Check size={20} /> Adicionado </>
-                  ) : (
-                    <> <ShoppingCart size={20} /> Adicionar ao Carrinho </>
-                  )}
+                  <ShoppingBag size={18} />
+                  <span className="text-sm">Adicionar</span>
                 </button>
               </div>
-            </div>
 
-          </div>
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -64,7 +64,7 @@ export function Footer() {
           <div>
             <h3 className="text-white font-bold mb-6 text-sm uppercase tracking-widest">Populares</h3>
             <ul className="space-y-4 text-sm">
-              <li><Link to="/catalogo?category=apple" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">iPhones & Apple</Link></li>
+              <li><Link to="/catalogo?category=apple" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Apple</Link></li>
               <li><Link to="/catalogo?category=notebooks" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">MacBooks M1/M2/M3</Link></li>
               <li><Link to="/catalogo?category=smartwatch" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Relógios Premium</Link></li>
               <li><Link to="/catalogo?category=custom" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Encomendas Especiais</Link></li>

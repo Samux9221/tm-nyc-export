@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ScrollToTop } from './components/ScrollToTop';
 
 import { Home } from './pages/Home';
 import { Catalog } from './pages/Catalog';
@@ -14,6 +15,7 @@ import { MobileNav } from './components/MobileNav';
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop />
     <CartSidebar />
       <div className="bg-brand-dark min-h-screen text-white font-sans selection:bg-brand-red selection:text-white">
         <Toaster 

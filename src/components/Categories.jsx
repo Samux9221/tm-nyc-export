@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { Smartphone, Laptop, Watch, Package, ArrowUpRight } from 'lucide-react';
+import { Smartphone, Shirt, Sparkles, Package, ArrowUpRight } from 'lucide-react';
+// 1. Importamos o componente 'motion'
+import { motion } from 'framer-motion';
 
 export function Categories() {
   const navigate = useNavigate();
@@ -13,84 +15,164 @@ export function Categories() {
     window.scrollTo(0, 0); 
   };
 
+  // --- CONFIGURAÇÃO DAS ANIMAÇÕES (VARIANTS) ---
+  
+  // Configuração do Container Pai (Controla a cascata/stagger)
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        // Atrasa o início de cada filho em 0.15s.
+        // Cria aquele efeito dominó elegante no Desktop.
+        staggerChildren: 0.15,
+        delayChildren: 0.2, // Um pequeno delay inicial antes de começar tudo
+      },
+    },
+  };
+
+  // Configuração de cada Card individual
+  const cardVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 50 // Começa 50px para baixo
+    },
+    visible: {
+      opacity: 1,
+      y: 0, // Chega na posição original
+      transition: {
+        // Usamos física de mola para ficar super suave, estilo iOS
+        type: "spring",
+        stiffness: 100, // Tensão da mola (menor = mais suave)
+        damping: 15,    // Amortecimento (para não quicar demais)
+        mass: 1
+      }
+    },
+  };
+  // --------------------------------------------
+
   const categories = [
+    // ... (Seu array de categorias permanece idêntico)
     { 
-      name: "Apple iPhone", 
-      desc: "Do 13 ao 16 Pro Max", 
+      id: 1,
+      name: "Apple & Tech", 
+      desc: "Lançamentos globais e topos de linha.", 
       icon: Smartphone,
-      filter: "apple" 
+      filter: "tech",
+      gridClass: "lg:col-span-2 lg:row-span-2 min-h-[120px] lg:min-h-[400px]",
+      bgClass: "bg-[#0a0a0a]"
     },
     { 
-      name: "MacBooks & iPads", 
-      desc: "Linhas M1, M2 e M3", 
-      icon: Laptop,
-      filter: "notebooks" 
+      id: 2,
+      name: "Vestuário Premium", 
+      desc: "Streetwear e alta costura.", 
+      icon: Shirt,
+      filter: "apparel",
+      gridClass: "lg:col-span-1 min-h-[120px] lg:min-h-[200px]",
+      bgClass: "bg-[#0a0a0a]"
     },
     { 
-      name: "Smartwatches", 
-      desc: "Apple Watch e Garmin", 
-      icon: Watch,
-      filter: "smartwatch" 
+      id: 3,
+      name: "Beleza & Perfumaria", 
+      desc: "Fragrâncias e cosméticos importados.", 
+      icon: Sparkles,
+      filter: "beauty",
+      gridClass: "lg:col-span-1 min-h-[120px] lg:min-h-[200px]",
+      bgClass: "bg-[#0a0a0a]"
     },
     { 
-      name: "Encomendas", 
-      desc: "Traga seu produto dos EUA", 
+      id: 4,
+      name: "Encomendas Especiais", 
+      desc: "Não achou? Nós trazemos sob medida para você.", 
       icon: Package,
-      filter: "custom" 
+      filter: "custom",
+      gridClass: "lg:col-span-2 min-h-[120px] lg:min-h-[200px]",
+      bgClass: "bg-gradient-to-br from-[#0a0a0a] to-brand-red/10 border-brand-red/20" 
     },
   ];
 
   return (
-    <section className="bg-[#050505] py-20 lg:py-24 border-t border-white/5 relative overflow-hidden">
+    <section className="bg-[#050505] py-20 lg:py-32 relative overflow-hidden">
       
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-brand-red/5 blur-[120px] rounded-full pointer-events-none" />
+      {/* O glow vermelho */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-red/5 blur-[150px] rounded-full pointer-events-none" />
       
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+      <div className="container mx-auto px-6 lg:px-12 relative z-10">
         
-        <div className="mb-12 lg:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <span className="text-brand-red text-xs font-bold tracking-widest uppercase mb-3 block">
-              Catálogo de Elite
+        {/* HEADER (Podemos animar também se quiser depois, mas vamos focar nos cards) */}
+        <div className="mb-12 lg:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-12">
+          {/* ... (Header idêntico ao anterior) */}
+           <div className="max-w-2xl">
+            <span className="text-brand-red text-xs font-bold tracking-widest uppercase mb-4 block">
+              Nossos Departamentos
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.1]">
-              O melhor da tecnologia global.
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.05]">
+              O mundo premium, <br className="hidden sm:block" />
+              direto para você.
             </h2>
           </div>
-          <p className="text-gray-400 text-sm md:text-base max-w-sm md:text-right border-l-2 md:border-l-0 md:border-r-2 border-brand-red/30 pl-4 md:pl-0 md:pr-4">
-            Produtos originais, lacrados e com garantia internacional. Selecione uma categoria para explorar.
+          <p className="text-neutral-400 text-sm sm:text-base max-w-sm font-light leading-relaxed">
+            De lançamentos da Apple a grifes exclusivas e perfumaria importada. Explore nossas categorias ou faça uma encomenda sob medida.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+        {/* === BENTO GRID COM FRAMER MOTION === 
+          1. Mudamos de 'div' para 'motion.div'.
+          2. Adicionamos as props de controle: initial, whileInView e viewport.
+          3. Passamos as variantes do container.
+        */}
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          // 'once: true' garante que anima só na primeira vez que desce a tela.
+          // 'amount: 0.2' significa que a animação dispara quando 20% do grid estiver visível.
+          viewport={{ once: true, amount: 0.2 }}
+        >
           
-          {categories.map((item, index) => (
-            <div 
-              key={index} 
-              onClick={() => handleCategoryClick(item.filter)}
-              className="group relative overflow-hidden bg-[#0a0a0a] p-4 sm:p-6 lg:p-8 rounded-xl lg:rounded-2xl border border-white/5 hover:border-brand-red/30 transition-all duration-500 cursor-pointer hover:-translate-y-1 shadow-lg hover:shadow-brand-red/5 flex flex-col justify-between min-h-[160px] sm:min-h-[200px]"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-brand-red/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              
-              <ArrowUpRight className="absolute top-4 right-4 lg:top-6 lg:right-6 text-neutral-600 group-hover:text-brand-red group-hover:-translate-y-1 group-hover:translate-x-1 transition-all duration-300 w-4 h-4 lg:w-5 lg:h-5" />
+          {categories.map((item) => {
+            const Icon = item.icon;
+            return (
+              /* 4. Cada Card agora é um 'motion.div'.
+                 5. Passamos as variantes do card individual.
+                 Ele herda automaticamente o estado "hidden" e "visible" do pai.
+              */
+              <motion.div 
+                key={item.id} 
+                variants={cardVariants}
+                onClick={() => handleCategoryClick(item.filter)}
+                // ATENÇÃO: Adicionei 'h-full' aqui para garantir que no Bento Grid do PC
+                // os cards estiquem para ocupar a altura total da linha.
+                className={`
+                  group relative overflow-hidden p-6 lg:p-8 rounded-[24px] md:rounded-3xl border border-white/5 
+                  hover:border-brand-red/40 transition-colors duration-500 cursor-pointer 
+                  flex flex-row items-center lg:flex-col lg:items-start lg:justify-between h-full
+                  shadow-xl hover:shadow-brand-red/10 active:scale-[0.98]
+                  ${item.gridClass} ${item.bgClass}
+                `}
+              >
+                {/* ... (Conteúdo interno do card permanece idêntico) */}
+                <ArrowUpRight className="hidden md:block absolute top-6 right-6 lg:top-8 lg:right-8 text-neutral-600 group-hover:text-brand-red group-hover:-translate-y-1 group-hover:translate-x-1 transition-all duration-300 w-5 h-5 lg:w-6 lg:h-6" />
 
-              <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-lg lg:rounded-xl bg-neutral-900 border border-white/10 flex items-center justify-center mb-4 lg:mb-8 group-hover:bg-brand-red/10 group-hover:border-brand-red/30 group-hover:scale-110 transition-all duration-500">
-                <item.icon className="text-neutral-300 group-hover:text-brand-red w-5 h-5 lg:w-6 lg:h-6 transition-colors duration-500" />
-              </div>
-              
-              <div>
-                {/* MICROAJUSTE: text-base no mobile (antes era text-sm) */}
-                <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-1 lg:mb-2 relative z-10 leading-tight">
-                  {item.name}
-                </h3>
-                {/* MICROAJUSTE: text-xs no mobile (antes era text-[10px]) */}
-                <p className="text-neutral-500 text-xs sm:text-sm group-hover:text-neutral-300 transition-colors duration-300 relative z-10 line-clamp-2">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+                <div className="shrink-0 w-14 h-14 lg:w-16 lg:h-16 rounded-xl bg-neutral-900 border border-white/10 flex items-center justify-center mr-5 lg:mr-0 lg:mb-8 group-hover:bg-brand-red/10 group-hover:border-brand-red/30 group-hover:scale-110 transition-all duration-500">
+                  <Icon className="text-neutral-400 group-hover:text-brand-red w-6 h-6 lg:w-7 lg:h-7 transition-colors duration-500" />
+                </div>
+                
+                <div className="flex-1 lg:mt-auto flex flex-col justify-center">
+                  <h3 className="text-lg lg:text-2xl font-bold text-white mb-1 lg:mb-2 relative z-10 leading-tight tracking-wide">
+                    {item.name}
+                  </h3>
+                  <p className="text-neutral-500 text-sm font-light group-hover:text-neutral-300 transition-colors duration-300 relative z-10 line-clamp-2 lg:line-clamp-none">
+                    {item.desc}
+                  </p>
+                </div>
 
-        </div>
+              </motion.div>
+            )
+          })}
+
+        </motion.div>
       </div>
     </section>
   );

@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Quando a gaveta de produto abre, o menu de baixo some suavemente */
+body.modal-open .mobile-nav {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 150%);
+}
