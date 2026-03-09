@@ -9,6 +9,8 @@ import { Hero } from '../components/Hero';
 import { Categories } from '../components/Categories';
 import { Logistics } from '../components/Logistics';
 import { Footer } from '../components/Footer';
+import { Streetwear } from '../components/Streetwear';
+import { ValueProp } from '../components/ValueProp';
 
 export function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -38,6 +40,8 @@ export function Home() {
         
         {/* 1. HERO */}
         <Hero />
+
+        <ValueProp />
 
         {/* 2. CATEGORIAS */}
         <Categories />
@@ -115,6 +119,8 @@ export function Home() {
             )}
           </div>
         </section>
+
+        <Streetwear />
 
         {/* 4. LOGÍSTICA */}
         <Logistics />
