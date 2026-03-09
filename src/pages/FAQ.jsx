@@ -6,8 +6,7 @@ import { Footer } from '../components/Footer';
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState(null);
 
-  // 🔴 COLOQUE SEU NÚMERO AQUI
-  const WHATSAPP_NUMBER = "5511999999999"; 
+  const WHATSAPP_NUMBER = "18627869891";
 
   const faqs = [
     {

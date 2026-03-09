@@ -71,9 +71,14 @@ export function Hero() {
           <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto mb-12 lg:mb-10">
             
             {/* Botão Primário: Formato Pílula, sem sombra pesada, visual limpo */}
-            <button className="w-full md:w-auto bg-brand-red hover:bg-red-600 text-white px-8 py-4 rounded-full text-base font-semibold transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2">
+            <a 
+              href="https://wa.me/18627869891" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="w-full md:w-auto bg-brand-red hover:bg-red-600 text-white px-8 py-4 rounded-full text-base font-semibold transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2"
+            >
               Fazer Cotação
-            </button>
+            </a>
             
             {/* Botão Secundário: Formato Pílula, Efeito "Vidro" (Glassmorphism) super elegante */}
             <Link to="/catalogo" className="w-full md:w-auto text-neutral-200 px-8 py-4 rounded-full text-base font-medium transition-all duration-300 active:scale-[0.98] flex items-center justify-center bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10">

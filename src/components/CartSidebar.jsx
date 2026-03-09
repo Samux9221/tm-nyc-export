@@ -14,7 +14,7 @@ export function CartSidebar() {
     cartTotal 
   } = useCart();
 
-  const WHATSAPP_NUMBER = "5511999999999"; 
+  const WHATSAPP_NUMBER = "18627869891"
 
   // Trava o scroll do fundo apenas quando a sacola está aberta
   useEffect(() => {

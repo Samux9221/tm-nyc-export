@@ -79,9 +79,14 @@ export function Header() {
 
           {/* BOTÃO CTA WHATSAPP (Só Desktop - Mobile chama pelo FloatingWhatsApp) */}
           <div className="hidden md:block">
-            <button className="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-bold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(22,163,74,0.3)] hover:shadow-[0_0_20px_rgba(22,163,74,0.6)] hover:-translate-y-0.5">
+            <a 
+              href="https://wa.me/18627869891" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-bold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(22,163,74,0.3)] hover:shadow-[0_0_20px_rgba(22,163,74,0.6)] hover:-translate-y-0.5 inline-block"
+            >
               Falar no WhatsApp
-            </button>
+            </a>
           </div>
 
         </div>

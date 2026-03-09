@@ -56,7 +56,7 @@ export function Footer() {
               <li><Link to="/" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Início</Link></li>
               <li><Link to="/catalogo" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Catálogo Completo</Link></li>
               <li><a href="#como-funciona" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Como Funciona</a></li>
-              <li><a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:translate-x-1 inline-flex items-center gap-1 transition-all duration-300 group">Rastrear Pedido <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
+              <li><a href="https://wa.me/18627869891" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:translate-x-1 inline-flex items-center gap-1 transition-all duration-300 group">Rastrear Pedido <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
             </ul>
           </div>
 
@@ -76,22 +76,22 @@ export function Footer() {
             <h3 className="text-white font-bold mb-6 text-sm uppercase tracking-widest">Atendimento</h3>
             <ul className="space-y-5 text-sm">
               <li>
-                <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="flex items-start gap-4 group">
+                <a href="https://wa.me/18627869891" target="_blank" rel="noopener noreferrer" className="flex items-start gap-4 group">
                   <div className="w-10 h-10 rounded-lg bg-[#0a0a0a] border border-white/5 flex items-center justify-center shrink-0 group-hover:border-green-500/30 group-hover:bg-green-500/10 transition-colors">
                     <MessageCircle className="w-4 h-4 text-neutral-400 group-hover:text-green-500 transition-colors" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-white font-medium group-hover:text-green-500 transition-colors">(11) 99999-9999</span>
+                    <span className="text-white font-medium group-hover:text-green-500 transition-colors">+1 (862) 786-9891</span>
                     <span className="text-xs text-neutral-600 mt-1">Seg a Sex: 9h às 18h</span>
                   </div>
                 </a>
               </li>
               <li>
-                <a href="mailto:contato@tmnycexport.com" className="flex items-center gap-4 group">
+                <a href="mailto:tmnycexport@gmail.com" className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-lg bg-[#0a0a0a] border border-white/5 flex items-center justify-center shrink-0 group-hover:border-brand-red/30 group-hover:bg-brand-red/10 transition-colors">
                     <Mail className="w-4 h-4 text-neutral-400 group-hover:text-brand-red transition-colors" />
                   </div>
-                  <span className="group-hover:text-white transition-colors">contato@tmnycexport.com</span>
+                  <span className="group-hover:text-white transition-colors">tmnycexport@gmail.com</span>
                 </a>
               </li>
               <li className="flex items-center gap-4">
