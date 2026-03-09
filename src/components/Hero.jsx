@@ -76,6 +76,7 @@ export function Hero() {
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-full md:w-auto bg-brand-red hover:bg-red-600 text-white px-8 py-4 rounded-full text-base font-semibold transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2"
+              text=""
             >
               Fazer Cotação
             </a>
@@ -126,7 +127,7 @@ export function Hero() {
              <div className="flex overflow-x-auto gap-5 pb-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1">
                {marcas.map((marca) => (
                  <Link 
-                   to={`/catalogo?marca=${marca.name}`} 
+                   to={'/catalogo?category=${marca.tag}'}
                    key={marca.id} 
                    // Card agora é flex-col, com altura automática e borda mais sutil.
                    // w-[65vw] deixa o próximo card mais visível, convidando ao scroll.

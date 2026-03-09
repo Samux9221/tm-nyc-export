@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ScrollToTop } from './components/ScrollToTop';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 
 import { Home } from './pages/Home';
 import { Catalog } from './pages/Catalog';
@@ -11,47 +11,43 @@ import { Login } from './pages/Login';
 import { Toaster } from 'react-hot-toast';
 import { About } from './components/About';
 import { MobileNav } from './components/MobileNav';
+import { PageTransition } from './components/PageTransition';
+
+// Criamos um componente interno para poder usar o useLocation()
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    // mode="wait" garante que a página atual suma ANTES da nova aparecer, evitando quebras de layout
+    <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+        <Route path="/catalogo" element={<PageTransition><Catalog /></PageTransition>} />
+        <Route path="/sobre" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/duvidas" element={<PageTransition><FAQ /></PageTransition>} />
+        <Route path="/admin" element={<Admin />} /> {/* Admin sem transição para ser mais rápido */}
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 function App() {
   return (
     <BrowserRouter>
-    <ScrollToTop />
-    <CartSidebar />
+      <CartSidebar />
       <div className="bg-brand-dark min-h-screen text-white font-sans selection:bg-brand-red selection:text-white">
         <Toaster 
             position="top-center"
             toastOptions={{
-              style: {
-                background: '#171717', // neutral-900
-                color: '#fff',
-                border: '1px solid #333',
-              },
-              success: {
-                iconTheme: {
-                  primary: '#22c55e', // brand-green
-                  secondary: '#fff',
-                },
-              },
-              error: {
-                iconTheme: {
-                  primary: '#ef4444', // brand-red
-                  secondary: '#fff',
-                },
-              },
+              style: { background: '#171717', color: '#fff', border: '1px solid #333' },
+              success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
+              error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
             }}
           />
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalogo" element={<Catalog />} />
-          <Route path="/sobre" element={<About />} />
-          <Route path="/duvidas" element={<FAQ />} />
-          
-          {/* Essas duas linhas SÃO OBRIGATÓRIAS agora: */}
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/login" element={<Login />} />
-
-        </Routes>
+        
+        <AnimatedRoutes />
+        
         <MobileNav />
       </div>
     </BrowserRouter>

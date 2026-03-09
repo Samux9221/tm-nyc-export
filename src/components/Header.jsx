@@ -80,7 +80,7 @@ export function Header() {
           {/* BOTÃO CTA WHATSAPP (Só Desktop - Mobile chama pelo FloatingWhatsApp) */}
           <div className="hidden md:block">
             <a 
-              href="https://wa.me/18627869891" 
+              href="https://wa.me/18627869891?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20falar%20com%20um%20consultor." 
               target="_blank" 
               rel="noopener noreferrer" 
               className="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-lg font-bold uppercase text-xs tracking-wider transition-all shadow-[0_0_15px_rgba(22,163,74,0.3)] hover:shadow-[0_0_20px_rgba(22,163,74,0.6)] hover:-translate-y-0.5 inline-block"

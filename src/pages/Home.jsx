@@ -83,10 +83,8 @@ export function Home() {
               <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 lg:gap-6 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1">
                 {featuredProducts.map((product) => (
                   <Link 
-                    to={`/produto/${product.id}`} 
+                    to={`/catalogo?search=${encodeURIComponent(product.name)}`} 
                     key={product.id} 
-                    onClick={() => window.scrollTo(0,0)}
-                    // NOVO TAMANHO: w-[55vw] no mobile. Cabem quase dois inteiros!
                     className="group shrink-0 w-[55vw] sm:w-[200px] lg:w-auto snap-center flex flex-col cursor-pointer"
                   >
                     {/* Container da Imagem: Aspect Square (1:1) com padding (p-5) */}

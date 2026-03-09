@@ -55,8 +55,8 @@ export function Footer() {
             <ul className="space-y-4 text-sm">
               <li><Link to="/" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Início</Link></li>
               <li><Link to="/catalogo" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Catálogo Completo</Link></li>
-              <li><a href="#como-funciona" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Como Funciona</a></li>
-              <li><a href="https://wa.me/18627869891" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:translate-x-1 inline-flex items-center gap-1 transition-all duration-300 group">Rastrear Pedido <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
+              <li><Link to="/#como-funciona" className="hover:text-white hover:translate-x-1 inline-block transition-all duration-300">Como Funciona</Link></li>
+              <li><a href="https://wa.me/18627869891?text=Ol%C3%A1!%20Gostaria%20de%20acompanhar%20o%20rastreio%20do%20meu%20pedido." target="_blank" rel="noopener noreferrer" className="hover:text-white hover:translate-x-1 inline-flex items-center gap-1 transition-all duration-300 group">Rastrear Pedido <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
             </ul>
           </div>
 

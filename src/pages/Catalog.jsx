@@ -12,22 +12,31 @@ import { useCart } from '../context/CartContext';
 export function Catalog() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  
   const [searchParams] = useSearchParams();
   const categoryFromUrl = searchParams.get('category'); 
+  const searchFromUrl = searchParams.get('search'); 
+
+  // Inicializações seguras
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl || "Todos");
+  const [searchTerm, setSearchTerm] = useState(searchFromUrl || "");
   
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { addToCart } = useCart(); 
 
+  // --- EFEITO PARA LER A URL ---
   useEffect(() => {
     if (categoryFromUrl) setSelectedCategory(categoryFromUrl);
     else setSelectedCategory("Todos");
-    window.scrollTo(0, 0); // Garante que a página comece no topo
-  }, [categoryFromUrl]);
 
+    if (searchFromUrl) setSearchTerm(searchFromUrl);
+    else setSearchTerm(""); // Limpa a busca se tirar o parâmetro da URL
+
+  }, [categoryFromUrl, searchFromUrl]);
+
+  // --- EFEITO PARA BUSCAR DO BANCO ---
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -58,31 +67,41 @@ export function Catalog() {
         <span className="text-xs text-neutral-500">{quantity}x {product.name}</span>
       </div>,
       {
-        style: {
-          background: '#1a1a1a',
-          color: '#fff',
-          border: '1px solid rgba(255,255,255,0.1)',
-        }
+        style: { background: '#1a1a1a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }
       }
     );
     setIsModalOpen(false);
   }
 
-  const categories = ["Todos", "Smartphones", "Notebooks", "Tablets", "Acessórios", "Apple", "Xiaomi"];
+  // --- ARRAY ATUALIZADO DE CATEGORIAS ---
+  const categories = ["Todos", "Apple", "Smartphones", "Notebooks", "Sneakers", "Gaming", "Grifes", "Acessórios"];
 
+  // --- FILTRO À PROVA DE BALAS (DEFENSIVO) ---
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    // String() garante que nunca teremos erro de null/undefined
+    const safeProductName = product.name ? String(product.name).toLowerCase() : "";
+    const safeSearchTerm = searchTerm ? String(searchTerm).toLowerCase() : "";
+    const safeCategory = selectedCategory ? String(selectedCategory).toLowerCase() : "todos";
+
+    // Filtro 1: Nome do produto bate com a barra de pesquisa?
+    const matchesSearch = safeProductName.includes(safeSearchTerm);
+
+    // Filtro 2: Categoria
     let matchesCategory = false;
-    if (selectedCategory === "Todos") matchesCategory = true;
-    else {
-      const productCat = product.category ? product.category.toLowerCase() : '';
-      const productName = product.name.toLowerCase();
-      const filter = selectedCategory.toLowerCase();
-      const isCategoryMatch = productCat.includes(filter) || filter.includes(productCat);
-      let isNameMatch = productName.includes(filter);
-      if (filter === 'apple' && productName.includes('iphone')) isNameMatch = true;
+    
+    if (safeCategory === "todos") {
+      matchesCategory = true;
+    } else {
+      const productCat = product.category ? String(product.category).toLowerCase() : '';
+      const isCategoryMatch = productCat.includes(safeCategory) || safeCategory.includes(productCat);
+      
+      let isNameMatch = safeProductName.includes(safeCategory);
+      // Regra especial para Apple
+      if (safeCategory === 'apple' && safeProductName.includes('iphone')) isNameMatch = true;
+
       matchesCategory = isCategoryMatch || isNameMatch;
     }
+
     return matchesSearch && matchesCategory;
   });
 
@@ -102,10 +121,10 @@ export function Catalog() {
           </p>
         </div>
 
-        {/* === FILTROS E BUSCA (Design Matte/Sólido) === */}
+        {/* === FILTROS E BUSCA === */}
         <div className="flex flex-col-reverse lg:flex-row gap-6 mb-12 items-start lg:items-center justify-between">
           
-          {/* Categorias (Pills Premium) */}
+          {/* Categorias */}
           <div className="flex gap-2 overflow-x-auto w-full lg:w-auto pb-4 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x">
             {categories.map(cat => (
               <button 
@@ -113,7 +132,7 @@ export function Catalog() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 snap-start ${
                   selectedCategory.toLowerCase() === cat.toLowerCase() 
-                    ? 'bg-white text-black shadow-sm' // Alto contraste, estilo Apple/Vercel
+                    ? 'bg-white text-black shadow-sm' 
                     : 'bg-transparent border border-white/10 text-neutral-400 hover:text-white hover:border-white/30'
                 }`}
               >
@@ -122,7 +141,7 @@ export function Catalog() {
             ))}
           </div>
 
-          {/* Barra de Busca (Mais limpa e integrada) */}
+          {/* Barra de Busca */}
           <div className="relative w-full lg:w-72 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within:text-white transition-colors duration-300" size={18} />
             <input 
@@ -154,24 +173,19 @@ export function Catalog() {
              </button>
            </div>
         ) : (
-          /* GRID RESPONSIVO: 2 colunas no celular, gap generoso para respirar */
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
                 onClick={() => openProductDetails(product)}
-                // O card é minimalista, focado na sutileza do hover
                 className="group flex flex-col cursor-pointer"
               >
-                {/* Palco do Produto (Imagem) */}
                 <div className="w-full aspect-square bg-[#0a0a0a] rounded-[24px] border border-white/5 group-hover:border-white/20 transition-all duration-500 mb-4 p-5 sm:p-8 flex items-center justify-center overflow-hidden relative">
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    // object-contain é o segredo aqui: o produto nunca é cortado, fica exposto como uma joia
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
-                  {/* Tag super sutil e elegante */}
                   {product.category && (
                     <span className="absolute top-4 left-4 bg-[#111] border border-white/10 text-neutral-400 text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md z-10">
                       {product.category}
@@ -179,7 +193,6 @@ export function Catalog() {
                   )}
                 </div>
 
-                {/* Informações Silenciosas e Precisas */}
                 <div className="px-2 flex flex-col gap-1">
                   <h3 className="text-white font-medium text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-neutral-300 transition-colors">
                     {product.name}

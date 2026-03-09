@@ -58,7 +58,7 @@ export function Logistics() {
   };
 
   return (
-    <section className="bg-[#050505] py-20 lg:py-32 border-t border-white/5 relative overflow-hidden">
+    <section id="como-funciona" className="bg-[#050505] py-20 lg:py-32 border-t border-white/5 relative overflow-hidden">
       
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         
