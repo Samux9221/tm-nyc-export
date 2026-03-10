@@ -58,7 +58,7 @@ export function Streetwear() {
           <div className="relative rounded-[32px] overflow-hidden group min-h-[250px] bg-[#0a0a0a] border border-white/10">
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
             <img 
-              src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?q=80&w=800&auto=format&fit=crop" 
+              src="https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?q=80&w=800&auto=format&fit=crop" 
               alt="Bolsas de Grife" 
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
             />
