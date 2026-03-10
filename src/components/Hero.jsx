@@ -126,9 +126,9 @@ export function Hero() {
              
              <div className="flex overflow-x-auto gap-5 pb-6 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1">
                {marcas.map((marca) => (
-                 <Link 
-                   to={'/catalogo?category=${marca.tag}'}
-                   key={marca.id} 
+                 <Link          
+                  to={`/catalogo?category=${marca.tag}`} 
+                  key={marca.id} 
                    // Card agora é flex-col, com altura automática e borda mais sutil.
                    // w-[65vw] deixa o próximo card mais visível, convidando ao scroll.
                    className="relative shrink-0 w-[65vw] sm:w-[45vw] h-auto rounded-[24px] overflow-hidden snap-center group bg-[#0a0a0a] border border-neutral-800/60 active:scale-[0.98] transition-all flex flex-col"
