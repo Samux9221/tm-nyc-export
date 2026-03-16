@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient'; 
 
-// === IMPORTANDO SEUS COMPONENTES VISUAIS ===
+// === IMPORTANDO OS SEUS COMPONENTES VISUAIS ===
 import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
 import { Categories } from '../components/Categories';
@@ -17,7 +17,7 @@ export function Home() {
 
   useEffect(() => {
     fetchFeaturedProducts();
-    // Garante que a Home sempre abra no topo ao ser montada
+    // Garante que a Home abre sempre no topo ao ser montada
     window.scrollTo(0, 0);
   }, []);
 
@@ -38,15 +38,10 @@ export function Home() {
       
       <main className="flex-1">
         
-        {/* 1. HERO */}
+        {/* 1. HERO (A primeira visualização) */}
         <Hero />
 
-        <ValueProp />
-
-        {/* 2. CATEGORIAS */}
-        <Categories />
-
-        {/* 3. DESTAQUES DA SEMANA (ESTILO VITRINE APPLE) */}
+        {/* 2. DESTAQUES DA SEMANA (Subiu para ficar logo abaixo do Hero) */}
         <section className="py-20 lg:py-32 relative overflow-hidden bg-[#050505]">
           <div className="container mx-auto px-6 lg:px-12 relative z-10">
             
@@ -76,10 +71,9 @@ export function Home() {
             {/* --- LISTA DE PRODUTOS --- */}
             {featuredProducts.length === 0 ? (
               <div className="text-center py-20 text-neutral-500 font-light border border-neutral-800/50 rounded-[24px] bg-[#0a0a0a]">
-                Preparando curadoria...
+                A preparar curadoria...
               </div>
             ) : (
-              /* Gap ajustado para 4, mantendo os cards mais próximos no celular */
               <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 lg:gap-6 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1">
                 {featuredProducts.map((product) => (
                   <Link 
@@ -87,22 +81,18 @@ export function Home() {
                     key={product.id} 
                     className="group shrink-0 w-[55vw] sm:w-[200px] lg:w-auto snap-center flex flex-col cursor-pointer"
                   >
-                    {/* Container da Imagem: Aspect Square (1:1) com padding (p-5) */}
                     <div className="relative aspect-square w-full bg-[#0a0a0a] rounded-[24px] overflow-hidden mb-4 border border-white/5 group-hover:border-brand-red/30 transition-colors duration-500 flex items-center justify-center p-5">
                       <img 
                         src={product.image} 
                         alt={product.name} 
-                        // object-contain garante que a foto caiba inteira sem cortar, cercada pelo fundo escuro
                         className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-out"
                       />
                       
-                      {/* Badge "Em Alta" miniaturizada e chique */}
                       <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full">
                         Em Alta
                       </div>
                     </div>
                     
-                    {/* Área de Texto Minimalista */}
                     <div className="px-1 flex flex-col gap-0.5">
                       <h4 className="text-white font-medium text-sm lg:text-base leading-snug group-hover:text-brand-red transition-colors line-clamp-1">
                         {product.name}
@@ -118,9 +108,16 @@ export function Home() {
           </div>
         </section>
 
+        {/* 3. PROPOSTA DE VALOR ("Importação premium que cabe no seu bolso") */}
+        <ValueProp />
+
+        {/* 4. CATEGORIAS ("Marcas que trabalhamos" - Passou para baixo do ValueProp) */}
+        <Categories />
+
+        {/* 5. STREETWEAR */}
         <Streetwear />
 
-        {/* 4. LOGÍSTICA */}
+        {/* 6. LOGÍSTICA */}
         <Logistics />
 
       </main>
