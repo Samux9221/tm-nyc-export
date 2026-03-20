@@ -3,7 +3,6 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient'; 
 
-// === IMPORTANDO OS SEUS COMPONENTES VISUAIS ===
 import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
 import { Categories } from '../components/Categories';
@@ -12,7 +11,6 @@ import { Footer } from '../components/Footer';
 import { Streetwear } from '../components/Streetwear';
 import { ValueProp } from '../components/ValueProp';
 
-// === DADOS DO CARROSSEL DE MARCAS (MOVIDO PARA CÁ) ===
 const marcas = [
   { 
     id: 1, 
@@ -42,14 +40,15 @@ const marcas = [
 
 export function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchFeaturedProducts();
-    // Garante que a Home abre sempre no topo ao ser montada
     window.scrollTo(0, 0);
   }, []);
 
   async function fetchFeaturedProducts() {
+    setIsLoading(true);
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -58,6 +57,7 @@ export function Home() {
 
     if (error) { console.error('Erro:', error); } 
     else { setFeaturedProducts(data); }
+    setIsLoading(false);
   }
 
   return (
@@ -66,10 +66,8 @@ export function Home() {
       
       <main className="flex-1">
         
-        {/* 1. HERO (A primeira visualização) */}
         <Hero />
 
-        {/* 2. DESTAQUES DA SEMANA */}
         <section className="py-20 lg:py-32 relative overflow-hidden bg-[#050505]">
           <div className="container mx-auto px-6 lg:px-12 relative z-10">
             
@@ -95,9 +93,21 @@ export function Home() {
               </Link>
             </div>
 
-            {featuredProducts.length === 0 ? (
+            {isLoading ? (
+              <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 lg:gap-6 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1">
+                {[...Array(4)].map((_, index) => (
+                  <div key={index} className="shrink-0 w-[55vw] sm:w-[200px] lg:w-auto snap-center flex flex-col animate-pulse">
+                    <div className="relative aspect-square w-full bg-white/5 rounded-[24px] mb-4 border border-white/5"></div>
+                    <div className="px-1 flex flex-col gap-2 mt-1">
+                      <div className="h-4 bg-white/10 rounded-md w-3/4"></div>
+                      <div className="h-3 bg-white/5 rounded-md w-1/2 mt-1"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : featuredProducts.length === 0 ? (
               <div className="text-center py-20 text-neutral-500 font-light border border-neutral-800/50 rounded-[24px] bg-[#0a0a0a]">
-                A preparar curadoria...
+                Nenhum destaque encontrado.
               </div>
             ) : (
               <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 lg:gap-6 pb-8 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1">
@@ -107,23 +117,37 @@ export function Home() {
                     key={product.id} 
                     className="group shrink-0 w-[55vw] sm:w-[200px] lg:w-auto snap-center flex flex-col cursor-pointer"
                   >
-                    <div className="relative aspect-square w-full bg-[#0a0a0a] rounded-[24px] overflow-hidden mb-4 border border-white/5 group-hover:border-brand-red/30 transition-colors duration-500 flex items-center justify-center p-5">
+                    <div className="relative aspect-square w-full bg-[#0a0a0a] rounded-[24px] overflow-hidden mb-4 border border-white/5 group-hover:border-white/20 transition-colors duration-500 flex items-center justify-center p-5">
+                      
+                      {/* EFEITO GLARE (LUZ DIAGONAL NO HOVER) */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-30 mix-blend-overlay"></div>
+
                       <img 
                         src={product.image} 
                         alt={product.name} 
-                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-out"
+                        className={`w-full h-full object-contain transition-transform duration-700 ease-out ${product.is_sold ? 'opacity-40 grayscale-[0.3]' : 'group-hover:scale-110'}`}
                       />
                       
-                      <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full">
-                        Em Alta
-                      </div>
+                      {!product.is_sold && (
+                        <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[8px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full z-10">
+                          Em Alta
+                        </div>
+                      )}
+
+                      {product.is_sold && (
+                        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                          <span className="bg-white/10 border border-white/20 text-white text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full shadow-2xl backdrop-blur-md">
+                            Esgotado
+                          </span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="px-1 flex flex-col gap-0.5">
-                      <h4 className="text-white font-medium text-sm lg:text-base leading-snug group-hover:text-brand-red transition-colors line-clamp-1">
+                      <h4 className={`font-medium text-sm lg:text-base leading-snug transition-colors line-clamp-1 ${product.is_sold ? 'text-neutral-500' : 'text-white group-hover:text-brand-red'}`}>
                         {product.name}
                       </h4>
-                      <span className="text-neutral-500 font-light text-xs lg:text-sm tracking-wide">
+                      <span className={`font-light text-xs lg:text-sm tracking-wide ${product.is_sold ? 'text-neutral-600 line-through' : 'text-neutral-500'}`}>
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
                       </span>
                     </div>
@@ -134,10 +158,8 @@ export function Home() {
           </div>
         </section>
 
-        {/* 3. PROPOSTA DE VALOR ("Importação premium que cabe no seu bolso") */}
         <ValueProp />
 
-        {/* --- NOVO: CARROSSEL MOBILE DE MARCAS (Apenas Mobile, abaixo de ValueProp) --- */}
         <section className="block lg:hidden bg-[#050505] pt-12 pb-6">
           <div className="container mx-auto px-6 relative z-10">
             <div className="flex items-center justify-between mb-5 px-1">
@@ -174,13 +196,8 @@ export function Home() {
           </div>
         </section>
 
-        {/* 4. CATEGORIAS ("O mundo premium, direto para você.") */}
         <Categories />
-
-        {/* 5. STREETWEAR */}
         <Streetwear />
-
-        {/* 6. LOGÍSTICA */}
         <Logistics />
 
       </main>

@@ -32,7 +32,7 @@ export function Catalog() {
     else setSelectedCategory("Todos");
 
     if (searchFromUrl) setSearchTerm(searchFromUrl);
-    else setSearchTerm(""); // Limpa a busca se tirar o parâmetro da URL
+    else setSearchTerm(""); 
 
   }, [categoryFromUrl, searchFromUrl]);
 
@@ -73,20 +73,15 @@ export function Catalog() {
     setIsModalOpen(false);
   }
 
-  // --- ARRAY ATUALIZADO DE CATEGORIAS ---
   const categories = ["Todos", "Apple", "Smartphones", "Notebooks", "Sneakers", "Gaming", "Grifes", "Acessórios"];
 
-  // --- FILTRO À PROVA DE BALAS (DEFENSIVO) ---
+  // --- FILTRO ---
   const filteredProducts = products.filter(product => {
-    // String() garante que nunca teremos erro de null/undefined
     const safeProductName = product.name ? String(product.name).toLowerCase() : "";
     const safeSearchTerm = searchTerm ? String(searchTerm).toLowerCase() : "";
     const safeCategory = selectedCategory ? String(selectedCategory).toLowerCase() : "todos";
 
-    // Filtro 1: Nome do produto bate com a barra de pesquisa?
     const matchesSearch = safeProductName.includes(safeSearchTerm);
-
-    // Filtro 2: Categoria
     let matchesCategory = false;
     
     if (safeCategory === "todos") {
@@ -96,7 +91,6 @@ export function Catalog() {
       const isCategoryMatch = productCat.includes(safeCategory) || safeCategory.includes(productCat);
       
       let isNameMatch = safeProductName.includes(safeCategory);
-      // Regra especial para Apple
       if (safeCategory === 'apple' && safeProductName.includes('iphone')) isNameMatch = true;
 
       matchesCategory = isCategoryMatch || isNameMatch;
@@ -123,8 +117,6 @@ export function Catalog() {
 
         {/* === FILTROS E BUSCA === */}
         <div className="flex flex-col-reverse lg:flex-row gap-6 mb-12 items-start lg:items-center justify-between">
-          
-          {/* Categorias */}
           <div className="flex gap-2 overflow-x-auto w-full lg:w-auto pb-4 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x">
             {categories.map(cat => (
               <button 
@@ -141,7 +133,6 @@ export function Catalog() {
             ))}
           </div>
 
-          {/* Barra de Busca */}
           <div className="relative w-full lg:w-72 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within:text-white transition-colors duration-300" size={18} />
             <input 
@@ -154,7 +145,7 @@ export function Catalog() {
           </div>
         </div>
 
-        {/* === STATUS E GRID DE PRODUTOS === */}
+        {/* === GRID DE PRODUTOS === */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 opacity-50">
              <div className="w-10 h-10 border-2 border-neutral-800 border-t-white rounded-full animate-spin mb-6"></div>
@@ -180,24 +171,37 @@ export function Catalog() {
                 onClick={() => openProductDetails(product)}
                 className="group flex flex-col cursor-pointer"
               >
+                {/* 1. MUDANÇA ARQUITETURAL: Aplicação de Efeito "Vendido" na imagem */}
                 <div className="w-full aspect-square bg-[#0a0a0a] rounded-[24px] border border-white/5 group-hover:border-white/20 transition-all duration-500 mb-4 p-5 sm:p-8 flex items-center justify-center overflow-hidden relative">
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 ease-out"
+                    className={`w-full h-full object-contain transition-transform duration-700 ease-out ${product.is_sold ? 'opacity-40 grayscale-[0.3]' : 'group-hover:scale-105'}`}
                   />
-                  {product.category && (
+                  
+                  {/* TAG DE CATEGORIA NORMAL */}
+                  {product.category && !product.is_sold && (
                     <span className="absolute top-4 left-4 bg-[#111] border border-white/10 text-neutral-400 text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-md z-10">
                       {product.category}
                     </span>
                   )}
+
+                  {/* MÁSCARA PREMIUM DE ESGOTADO */}
+                  {product.is_sold && (
+                    <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                      <span className="bg-white/10 border border-white/20 text-white text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full shadow-2xl backdrop-blur-md">
+                        Esgotado
+                      </span>
+                    </div>
+                  )}
                 </div>
 
+                {/* 2. MUDANÇA ARQUITETURAL: Cores escurecidas no nome e preço se esgotado */}
                 <div className="px-2 flex flex-col gap-1">
-                  <h3 className="text-white font-medium text-sm sm:text-base leading-snug line-clamp-1 group-hover:text-neutral-300 transition-colors">
+                  <h3 className={`font-medium text-sm sm:text-base leading-snug line-clamp-1 transition-colors ${product.is_sold ? 'text-neutral-500' : 'text-white group-hover:text-neutral-300'}`}>
                     {product.name}
                   </h3>
-                  <span className="text-neutral-500 font-light text-sm tracking-wide">
+                  <span className={`font-light text-sm tracking-wide ${product.is_sold ? 'text-neutral-600 line-through' : 'text-neutral-500'}`}>
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
                   </span>
                 </div>

@@ -1,19 +1,31 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient'; // Importação do Supabase adicionada
 
 export function FeaturedProducts() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Simulando a busca do Supabase
-    setProducts([
-      { id: 1, name: "iPhone 15 Pro Max", price: 6890.00, image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=800&auto=format&fit=crop", badge: "Mais Vendido" },
-      { id: 2, name: "MacBook Air M2", price: 7499.00, image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop", badge: "Oferta" },
-      { id: 3, name: "Apple Watch Ultra 2", price: 4599.00, image: "https://images.unsplash.com/photo-1697227092323-93d396a84c8a?q=80&w=800&auto=format&fit=crop", badge: null },
-      { id: 4, name: "iPad Pro 12.9", price: 6200.00, image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=800&auto=format&fit=crop", badge: null },
-    ]);
+    // Busca real no Supabase: apenas produtos marcados como 'featured'
+    async function fetchFeaturedProducts() {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('featured', true)
+        .order('created_at', { ascending: false })
+        .limit(4); // Limita aos 4 destaques mais recentes para manter o design limpo
+
+      if (!error && data) {
+        setProducts(data);
+      }
+    }
+
+    fetchFeaturedProducts();
   }, []);
+
+  // Se não houver destaques, não renderiza a secção para não ficar um espaço vazio
+  if (products.length === 0) return null;
 
   return (
     <section className="bg-[#050505] py-24 lg:py-32 relative overflow-hidden">
@@ -47,44 +59,54 @@ export function FeaturedProducts() {
           
           {products.map((product) => (
             <Link 
-              to={`/produto/${product.id}`}
+              to={`/catalogo?search=${product.name}`} // Direciona para o catálogo ou para a rota do modal
               key={product.id} 
-              // w-[65vw] deixa o card mais estreito no mobile, mostrando o próximo e dando elegância
               className="shrink-0 w-[65vw] sm:w-[45vw] md:w-full snap-center group flex flex-col items-center cursor-pointer"
             >
               
-              {/* Caixa da Imagem (Fundo escuro em vidro, imagem com espaço em volta) */}
+              {/* Caixa da Imagem */}
               <div className="relative w-full aspect-[4/5] bg-gradient-to-b from-[#0e0e0e] to-[#050505] rounded-[2rem] border border-white/5 group-hover:border-white/10 transition-colors duration-500 overflow-hidden flex items-center justify-center p-6 mb-6 shadow-2xl shadow-black/50">
                 
-                {product.badge && (
+                {/* Tag de Categoria */}
+                {product.category && !product.is_sold && (
                   <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-md text-white text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full z-20 border border-white/5">
-                    {product.badge}
+                    {product.category}
                   </div>
                 )}
 
-                {/* Imagem do produto solta dentro do card, com leve zoom no hover */}
+                {/* MÁSCARA PREMIUM DE ESGOTADO */}
+                {product.is_sold && (
+                  <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                    <span className="bg-white/10 border border-white/20 text-white text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full shadow-2xl backdrop-blur-md">
+                      Esgotado
+                    </span>
+                  </div>
+                )}
+
                 <img 
                   src={product.image} 
                   alt={product.name} 
-                  className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.33,1,0.68,1)]"
+                  className={`w-full h-full object-cover rounded-xl transition-transform duration-700 ease-[cubic-bezier(0.33,1,0.68,1)] ${product.is_sold ? 'opacity-40 grayscale-[0.3]' : 'group-hover:scale-105'}`}
                 />
               </div>
 
               {/* Textos Centralizados e Limpos */}
-              <div className="text-center w-full px-2">
-                <h3 className="text-base lg:text-lg font-semibold text-white tracking-tight mb-1">
+              <div className="text-center w-full px-2 flex flex-col gap-1">
+                <h3 className={`text-base lg:text-lg font-semibold tracking-tight mb-1 transition-colors ${product.is_sold ? 'text-neutral-500' : 'text-white group-hover:text-neutral-300'}`}>
                   {product.name}
                 </h3>
                 
-                <p className="text-neutral-500 text-sm font-light mb-4">
-                  A partir de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
+                <p className={`text-sm font-light mb-4 ${product.is_sold ? 'text-neutral-600 line-through' : 'text-neutral-500'}`}>
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)}
                 </p>
 
-                {/* Link que aparece sutilmente no hover (Apenas PC) */}
-                <div className="hidden lg:flex items-center justify-center gap-1 opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                  <span className="text-brand-red text-xs font-bold uppercase tracking-wider">Detalhes</span>
-                  <ChevronRight className="w-3 h-3 text-brand-red" />
-                </div>
+                {/* Detalhes Hover (Apenas PC) - Oculto se esgotado */}
+                {!product.is_sold && (
+                  <div className="hidden lg:flex items-center justify-center gap-1 opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                    <span className="text-brand-red text-xs font-bold uppercase tracking-wider">Ver Detalhes</span>
+                    <ChevronRight className="w-3 h-3 text-brand-red" />
+                  </div>
+                )}
               </div>
 
             </Link>
