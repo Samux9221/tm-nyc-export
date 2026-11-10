@@ -3,7 +3,10 @@ name: Despertador do Supabase
 on:
   schedule:
     - cron: '0 12 * * *'
-  workflow_dispatch: 
+  workflow_dispatch:
+
+permissions:
+  actions: write # necessário para o passo que reativa o próprio workflow
 
 jobs:
   ping:
@@ -11,11 +14,18 @@ jobs:
     steps:
       - name: Fazendo uma requisição para o banco de dados
         env:
-          # URL direta (como é texto puro, fica entre aspas, SEM as chaves do GitHub)
+          # A URL é pública; só a chave vem dos Secrets
           URL: "https://vyjajsgmgdtkmojpwpuf.supabase.co"
-          # KEY protegida (aqui sim usamos as chaves, pois ele vai buscar lá nos Secrets)
           KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        # --fail faz o job falhar em 4xx/5xx (antes um 404/401 passava como sucesso)
         run: |
-          curl -X GET "$URL/rest/v1/produtos?select=id&limit=1" \
-          -H "apikey: $KEY" \
-          -H "Authorization: Bearer $KEY"
+          test -n "$KEY" || { echo "Secret VITE_SUPABASE_ANON_KEY não configurada"; exit 1; }
+          curl --fail-with-body -sS "$URL/rest/v1/products?select=id&limit=1" \
+            -H "apikey: $KEY" \
+            -H "Authorization: Bearer $KEY"
+
+      # O GitHub desativa workflows agendados após 60 dias sem commits; reativar zera esse contador
+      - name: Mantendo o workflow ativo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/ping-supabase.yml/enable"

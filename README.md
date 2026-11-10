@@ -1,16 +1,37 @@
-# React + Vite
+# TM NYC Export
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site em React + Vite com banco de dados no Supabase.
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Keep-alive do Supabase
 
-## React Compiler
+No plano gratuito, o Supabase pausa o projeto após 7 dias sem atividade. O workflow
+`.github/workflows/ping-supabase.yml` roda todo dia às 12:00 UTC e faz uma leitura mínima
+(`products?select=id&limit=1`) via API REST, o que mantém o banco ativo.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Configuração
 
-## Expanding the ESLint configuration
+1. No GitHub: **Settings → Secrets and variables → Actions → New repository secret**
+2. Nome: `VITE_SUPABASE_ANON_KEY` — valor: a *anon key* do projeto
+   (Supabase → Project Settings → API).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Ou pelo terminal:
+
+```bash
+gh secret set VITE_SUPABASE_ANON_KEY
+```
+
+### Testar
+
+```bash
+gh workflow run ping-supabase.yml
+gh run list --workflow ping-supabase.yml --limit 1
+```
+
+O job falha (e o GitHub envia e-mail) se a secret estiver ausente ou se o Supabase
+responder com erro. O próprio workflow se reativa a cada execução, evitando que o
+GitHub o desative após 60 dias sem commits no repositório.
